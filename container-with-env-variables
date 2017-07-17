@@ -1,0 +1,31 @@
+---
+type: container
+name: container-with-env
+
+inputs:
+  parameters:
+    code:
+  artifacts:
+  - from: "%%code%%"
+    path: /src
+
+container:
+  image: ubuntu
+ 
+---
+type: workflow
+name: container-with-env-workflow
+inputs:
+  parameters:
+    commit:
+      default: "%%session.commit%%"
+    repo:
+      default: "%%session.repo%%"
+    version:
+      default: "latest"
+    domain:
+      default: " "
+    code:  
+steps:
+  - container:
+      template: container-with-env

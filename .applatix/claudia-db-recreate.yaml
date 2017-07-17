@@ -1,0 +1,96 @@
+---
+type: workflow
+name: claudia-db-recreate-workflow
+inputs:
+  parameters:
+    commit:
+      default: "%%session.commit%%"
+    repo:
+      default: "%%session.repo%%"
+steps:
+- userdb:
+    template: claudia-userdb
+  costdb:
+    template: claudia-costdb
+
+---
+type: deployment
+name: claudia-userdb
+application:
+  name: "claudia"
+deployment:
+  name: "claudia-userdb"
+scale:
+  min: 1
+internal_routes:
+- name: "userdb"
+  ports:
+  - name: postgres
+    port: 5432
+    target_port: 5432
+volumes:
+  userdb-vol:
+    storage_class: ssd
+    size_gb: 1
+containers:
+- userdb:
+    template: claudia-userdb-container
+    parameters:
+      userdb-vol: "%%volumes.userdb-vol%%"
+
+---
+type: deployment
+name: claudia-costdb
+application:
+  name: "claudia"
+deployment:
+  name: "claudia-costdb"
+scale:
+  min: 1
+internal_routes:
+- name: "costdb"
+  ports:
+  - name: influxdb
+    port: 8086
+    target_port: 8086
+volumes:
+  costdb-vol:
+    storage_class: ssd
+    size_gb: 20
+containers:
+- costdb:
+    template: claudia-costdb-container
+    parameters:
+      costdb-vol: "%%volumes.costdb-vol%%"
+
+---
+type: container
+name: claudia-userdb-container
+container:
+  resources:
+    mem_mib: 256
+    cpu_cores: 0.1
+  image: "postgres:9.6.1"
+  docker_options: -e POSTGRES_PASSWORD=my-secret-pw -e POSTGRES_DB=userdb -e PGDATA=/var/lib/postgresql/data/pgdata
+inputs:
+  parameters:
+    userdb-vol:
+volume_mounts:
+- mount_path: /var/lib/postgresql/data
+  volume: "%%userdb-vol%%"
+
+---
+type: container
+name: claudia-costdb-container
+container:
+  resources:
+    mem_mib: 4096
+    cpu_cores: 0.1
+  image: "influxdb:1.2.0"
+  docker_options: -e INFLUXDB_HTTP_MAX_ROW_LIMIT=40000 -e INFLUXDB_REPORTING_DISABLED=true
+inputs:
+  parameters:
+    costdb-vol:
+volume_mounts:
+- mount_path: /var/lib/influxdb
+  volume: "%%costdb-vol%%"

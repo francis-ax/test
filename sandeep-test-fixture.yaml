@@ -1,0 +1,50 @@
+---
+type: fixture
+name: sandeep-test-fixture
+description: fixture for test purposes
+concurrency: 1
+attributes:
+    ip_address:
+        type: string
+    instance_type:
+        type: string
+        flags: required
+        options:
+          - m3.medium
+          - m3.large
+          - m3.xlarge
+          - m3.2xlarge
+        default: m3.2xlarge
+actions:
+    create:
+        template: sandeep-test-fixture-action
+        parameters:
+            INSTANCE_TYPE: "%%fixture.instance_type%%"
+            ACTION: create
+    delete:
+        template: sandeep-test-fixture-action
+        parameters:
+            ACTION: delete
+    snapshot:
+        template: sandeep-test-fixture-action
+        parameters:
+            ACTION: snapshot
+
+---
+type: container
+name: sandeep-test-fixture-action
+container:
+    resources:
+        mem_mib: 200
+        cpu_cores: 0.05
+    image: "debian:8.5"
+    command: "echo 'performing action %%ACTION%% instance_type: %%INSTANCE_TYPE%%'; sleep 60; echo '{\"ip_address\": \"1.2.3.4\"}' > /tmp/fix_attrs.json"
+inputs:
+    parameters:
+        ACTION:
+        INSTANCE_TYPE:
+            default: "m3.medium"
+outputs:
+    artifacts:
+        attributes:
+            path: /tmp/fix_attrs.json
