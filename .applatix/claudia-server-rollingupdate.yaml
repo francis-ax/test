@@ -14,10 +14,6 @@ inputs:
     dns_domain:
       default: " "
 steps:
-- ingestd:
-    template: claudia-ingestd
-    parameters:
-      version:
   claudiad:
     template: claudia-server
     parameters:
