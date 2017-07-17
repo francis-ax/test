@@ -14,7 +14,7 @@ inputs:
     dns_domain:
       default: " "
 steps:
-  claudiad:
+- claudiad:
     template: claudia-server
     parameters:
       version:
