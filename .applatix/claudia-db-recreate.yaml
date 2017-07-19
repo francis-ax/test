@@ -3,10 +3,6 @@ type: workflow
 name: claudia-db-recreate-workflow
 inputs:
   parameters:
-    commit:
-      default: "%%session.commit%%"
-    repo:
-      default: "%%session.repo%%"
 steps:
 - userdb:
     template: claudia-userdb

@@ -3,10 +3,6 @@ type: workflow
 name: claudia-server-rollingupdate-workflow
 inputs:
   parameters:
-    commit:
-      default: "%%session.commit%%"
-    repo:
-      default: "%%session.repo%%"
     version:
       default: "latest"
     dns_prefix:
