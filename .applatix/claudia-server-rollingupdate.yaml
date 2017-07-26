@@ -8,7 +8,7 @@ inputs:
     dns_prefix:
       default: "claudia"
     dns_domain:
-      default: " "
+      default: "francis.applatix.net"
 steps:
 - ingestd:
     template: claudia-ingestd
@@ -29,12 +29,12 @@ application:
 deployment:
   name: "claudia-server"
 scale:
-  min: 3
+  min: 12
 strategy:
   type: rolling_update
   rolling_update:
-    max_unavailable: 0
-    max_surge: 1  
+    max_unavailable: 2
+    max_surge: 3
 external_routes:
 - name: "claudia-server"
   dns_prefix: "%%dns_prefix%%"
@@ -60,12 +60,12 @@ application:
 deployment:
   name: "claudia-ingestd"
 scale:
-  min: 1
+  min: 12
 strategy:
   type: rolling_update
   rolling_update:
-    max_unavailable: 0
-    max_surge: 1    
+    max_unavailable: 1
+    max_surge: 2    
 internal_routes:
 - name: "ingestd"
   ports:
@@ -84,7 +84,7 @@ type: container
 name: claudia-ingestd-container
 container:
   resources:
-    mem_mib: 512
+    mem_mib: 700
     cpu_cores: 0.1
   image: "get.applatix.io/claudia:%%version%%"
   command: "/usr/bin/ingestd run"
@@ -98,7 +98,7 @@ type: container
 name: claudia-server-container
 container:
   resources:
-    mem_mib: 512
+    mem_mib: 750
     cpu_cores: 0.1
   image: "get.applatix.io/claudia:%%version%%"
   command: "/usr/bin/claudiad --insecure --port 80"
